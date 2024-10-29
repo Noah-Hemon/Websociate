@@ -1,0 +1,15 @@
+{
+  "name": "jamcat",
+  "version": "1.0.0",
+  "description": "Application de salle de jeu en temps réel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "socket.io": "^4.8.1"
+  },
+  "author": "Votre Nom",
+  "license": "ISC"
+}

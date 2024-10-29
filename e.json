@@ -1,0 +1,25 @@
+{
+    "title": "Sample Quiz",
+    "description": "A sample quiz to demonstrate the JSON structure.",
+    "author": "Quiz Creator",
+    "questions": [
+      {
+        "questionText": "What is the capital of France?",
+        "answers": [
+          "Paris",
+          "London",
+          "Berlin",
+          "Madrid"
+        ]
+      },
+      {
+        "questionText": "What is 2 + 2?",
+        "answers": [
+          "4",
+          "3",
+          "5",
+          "6"
+        ]
+      }
+    ]
+  }
