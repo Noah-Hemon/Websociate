@@ -109,7 +109,7 @@
       color: #fff;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
@@ -163,19 +163,22 @@
 
     new Vue({
       el: '#app',
-      data: {
-        currentView: 'main', // Vue actuelle : "main" pour l'accueil, "room" pour la salle, "game" pour le jeu
-        username: '',
-        roomId: '',
-        users: [],
-        joinSound: null,
-        userListInterval: null,
-        isHost: false,
-        quiz: null,
-        fileName: '',
-        currentQuestionIndex: 0,
-        currentQuestion: null,
-        currentAnswers: []
+      data() {
+        return {
+          currentView: 'main', // Vue actuelle : "main" pour l'accueil, "room" pour la salle, "game" pour le jeu
+          username: '',
+          roomId: '',
+          users: [],
+          joinSound: null,
+          userListInterval: null,
+          isHost: false,
+          quiz: null,
+          fileName: '',
+          currentQuestionIndex: 0,
+          currentQuestion: null,
+          currentAnswers: [],
+          quizStatusInterval: null,
+        };
       },
       mounted() {
         this.joinSound = document.getElementById("join-sound"); // Charger l'audio pour le son de connexion
@@ -186,8 +189,42 @@
         socket.on('roomCreated', this.onRoomCreated);
         socket.on('roomJoined', this.onRoomJoined);
         socket.on('updateUserList', this.updateUserList);
-        socket.on('quizUploaded', this.onQuizUploaded);
-        socket.on('startGame', this.onStartGame);
+        socket.on('quizUploaded', (quiz) => {
+          console.log('Received quizUploaded event:', quiz);
+          if (quiz) {
+            this.quiz = quiz;
+            alert('Quiz uploaded successfully!');
+          } else {
+            alert('Failed to upload quiz. Please check the format.');
+          }
+        });
+        socket.on('startGame', (quiz) => {
+          console.log('Received startGame event with quiz:', quiz);
+          this.onStartGame(quiz);
+        });
+        socket.on('quizStatus', (quiz, started) => {
+          console.log('Received quizStatus event:', quiz, started);
+          if (quiz) {
+            this.quiz = quiz;
+            if (started) {
+              this.onStartGame(quiz);
+            }
+          }
+        });
+
+        // Start the interval to request user list updates
+        this.userListInterval = setInterval(() => {
+          if (this.roomId) {
+            socket.emit('requestUserList', this.roomId);
+          }
+        }, 2000);
+
+        // Start the interval to request quiz status updates
+        this.quizStatusInterval = setInterval(() => {
+          if (this.roomId) {
+            socket.emit('requestQuizStatus', this.roomId);
+          }
+        }, 2000);
       },
       methods: {
         // Fonction pour créer une salle
@@ -257,7 +294,7 @@
           this.roomId = '';
           this.users = [];
           this.stopJoinSound();
-          this.stopUserListInterval();
+          this.stopAllIntervals(); // Stop all intervals
         },
 
         // Start the interval to request user list updates
@@ -283,7 +320,7 @@
             try {
               this.quiz = JSON.parse(e.target.result);
               console.log('Quiz file uploaded:', this.quiz);
-              socket.emit('uploadQuiz', this.roomId, JSON.stringify(this.quiz));
+              socket.emit('uploadQuiz', this.roomId, JSON.stringify(this.quiz)); // Emit the uploadQuiz event
             } catch (error) {
               console.error('Error parsing quiz file:', error);
               alert('Invalid quiz file format.');
@@ -309,7 +346,7 @@
             return;
           }
           console.log('Starting game for room:', this.roomId);
-          socket.emit('startGame', this.roomId);
+          socket.emit('startGame', this.roomId); // Emit the startGame event without the quiz object
         },
 
         // Handle start game event
@@ -323,6 +360,7 @@
           this.currentView = 'game';
           this.currentQuestionIndex = 0;
           this.loadQuestion();
+          this.stopAllIntervals(); // Stop all intervals
         },
 
         // Load a question
@@ -358,6 +396,18 @@
           for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
+          }
+        },
+
+        // Stop all intervals
+        stopAllIntervals() {
+          if (this.userListInterval) {
+            clearInterval(this.userListInterval);
+            this.userListInterval = null;
+          }
+          if (this.quizStatusInterval) {
+            clearInterval(this.quizStatusInterval);
+            this.quizStatusInterval = null;
           }
         }
       }
