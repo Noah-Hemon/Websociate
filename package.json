@@ -10,6 +10,6 @@
     "express": "^4.21.1",
     "socket.io": "^4.8.1"
   },
-  "author": "Votre Nom",
+  "author": "Noah HEMON",
   "license": "ISC"
 }

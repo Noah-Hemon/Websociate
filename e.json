@@ -20,6 +20,42 @@
           "5",
           "6"
         ]
+      },
+      {
+        "questionText": "What is the largest planet in our solar system?",
+        "answers": [
+          "Jupiter",
+          "Earth",
+          "Saturn",
+          "Mars"
+        ]
+      },
+      {
+        "questionText": "What is the powerhouse of the cell?",
+        "answers": [
+          "Mitochondria",
+          "Nucleus",
+          "Ribosome",
+          "Endoplasmic Reticulum"
+        ]
+      },
+      {
+        "questionText": "What is the largest mammal in the world?",
+        "answers": [
+          "Blue Whale",
+          "Elephant",
+          "Giraffe",
+          "Hippopotamus"
+        ]
+      },
+      {
+        "questionText": "What is the tallest mountain in the world?",
+        "answers": [
+          "Mount Everest",
+          "K2",
+          "Kangchenjunga",
+          "Lhotse"
+        ]
       }
     ]
   }

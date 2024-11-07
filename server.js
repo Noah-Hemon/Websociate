@@ -8,6 +8,8 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const rooms = {}; // Stockage des salles et utilisateurs
+const quizzes = {}; // Stockage des quizzes par ID de salle
+const quizStarted = {}; // Stockage de l'état de démarrage des quizzes par ID de salle
 
 // Servir les fichiers statiques (comme Gimkit.mp3) depuis le dossier "public"
 app.use(express.static(path.join(__dirname, 'public')));
@@ -77,8 +79,9 @@ io.on('connection', (socket) => {
       try {
         const parsedQuiz = JSON.parse(quiz);
         if (validateQuiz(parsedQuiz)) {
-          rooms[roomId].quiz = parsedQuiz;
-          socket.emit('quizUploaded', true);
+          quizzes[roomId] = parsedQuiz;
+          quizStarted[roomId] = false;
+          io.to(roomId).emit('quizUploaded', parsedQuiz); // Emit the quizUploaded event with the quiz data
           console.log(`Quiz uploaded for room ${roomId}:`, parsedQuiz);
         } else {
           socket.emit('quizUploaded', false);
@@ -95,10 +98,19 @@ io.on('connection', (socket) => {
   socket.on('startGame', (roomId) => {
     if (rooms[roomId] && socket.id === rooms[roomId].host) {
       console.log(`Starting game for room ${roomId}`);
-      io.to(roomId).emit('startGame', rooms[roomId].quiz);
-      console.log(`Game started for room ${roomId}`);
+      quizStarted[roomId] = true;
+      io.to(roomId).emit('startGame', quizzes[roomId]);
+      console.log(`Game started for room ${roomId} with quiz:`, quizzes[roomId]);
     } else {
       console.log(`Failed to start game for room ${roomId}`);
+    }
+  });
+
+  // Handle request for quiz and started status
+  socket.on('requestQuizStatus', (roomId) => {
+    if (quizzes[roomId] && quizStarted[roomId] !== undefined) {
+      socket.emit('quizStatus', quizzes[roomId], quizStarted[roomId]);
+      console.log(`Quiz status requested for room ${roomId}:`, quizzes[roomId], quizStarted[roomId]);
     }
   });
 
