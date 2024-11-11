@@ -15,7 +15,7 @@ const quizStarted = {}; // Stockage de l'état de démarrage des quizzes par ID 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'game.html'));
 });
 
 io.on('connection', (socket) => {
