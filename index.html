@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JamCat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #1e1e2f;
+      color: #fff;
+    }
+    #app {
+      text-align: center;
+    }
+    button {
+      width: 200px;
+      padding: 15px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4caf50;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .introduction {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #2e2e3f;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    .introduction p {
+      margin: 10px 0;
+      font-size: 1rem;
+      color: #ccc;
+    }
+    .introduction ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .introduction ul li {
+      margin: 15px 0;
+      padding: 10px;
+      background-color: #3e3e4f;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    .introduction ul li:hover {
+      background-color: #4e4e5f;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>Welcome to JamCat</h1>
+    <button @click="navigateTo('game.html')">Play Game</button>
+    <button @click="navigateTo('creation.html')">Create Quiz</button>
+    <div class="introduction">
+      <p>
+        This project was created by Noah HEMON and Ian ROUVRAIS. JamCat is a real-time quiz game application where you can either join a game room to participate in quizzes or create your own quizzes to challenge others.
+      </p>
+      <p>
+        To get started:
+      </p>
+      <ul>
+        <li>Click "Play Game" to join an existing game room and test your knowledge against other players.</li>
+        <li>Click "Create Quiz" to design your custom quiz and share it with others.</li>
+      </ul>
+      <p>
+        Enjoy the game and have fun learning!
+      </p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      methods: {
+        navigateTo(page) {
+          window.location.href = page;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

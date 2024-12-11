@@ -10,12 +10,13 @@ const io = new Server(server);
 const rooms = {}; // Stockage des salles et utilisateurs
 const quizzes = {}; // Stockage des quizzes par ID de salle
 const quizStarted = {}; // Stockage de l'état de démarrage des quizzes par ID de salle
+const scores = {}; // Track scores for each player in each room
+const finishedPlayers = {}; // Track finished players for each room
 
-// Servir les fichiers statiques (comme Gimkit.mp3) depuis le dossier "public"
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'game.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 io.on('connection', (socket) => {
@@ -106,6 +107,51 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('gameOver', (roomId, score) => {
+    console.log(`GameOver received: roomId=${roomId}, score=${score}, player=${socket.id}`);
+    if (!rooms[roomId]) return; // Guard clause: invalid room
+
+    // Find user and store score
+    const user = rooms[roomId].users.find((user) => user.id === socket.id);
+    if (user) {
+      scores[socket.id] = { username: user.username, score: score, timestamp: Date.now() };
+
+      // Redirect this player to draw.html
+      socket.emit('redirect', 'draw.html');
+
+      // Initialize finishedPlayers for the room if not already done
+      if (!finishedPlayers[roomId]) {
+        finishedPlayers[roomId] = 0;
+      }
+      finishedPlayers[roomId]++;
+
+      // Check if all players have finished
+      if (finishedPlayers[roomId] === rooms[roomId].users.length) {
+        const leaderboard = rooms[roomId].users.map((user) => ({
+          username: user.username,
+          score: scores[user.id]?.score || 0,
+          timestamp: scores[user.id]?.timestamp || Infinity, // Default to latest if missing
+        }));
+
+        // Sort by score and timestamp
+        leaderboard.sort((a, b) => {
+          if (b.score === a.score) {
+            return a.timestamp - b.timestamp; // Earlier timestamp wins
+          }
+          return b.score - a.score; // Higher score wins
+        });
+
+        // Notify all players in the room
+        io.to(roomId).emit('leaderboard', leaderboard);
+        console.log(`Leaderboard for room ${roomId}:`, leaderboard);
+
+        // Reset the room for the next game
+        finishedPlayers[roomId] = 0;
+      }
+    }
+  });
+
+
   // Handle request for quiz and started status
   socket.on('requestQuizStatus', (roomId) => {
     if (quizzes[roomId] && quizStarted[roomId] !== undefined) {
@@ -120,6 +166,7 @@ io.on('connection', (socket) => {
 
     if (rooms[roomId]) {
       rooms[roomId].users.push({ id: socket.id, username });
+      scores[socket.id] = { score: 0, timestamp: null }; // Initialize score and timestamp
       socket.join(roomId);
       console.log(`Utilisateur ${username} a rejoint la salle ${roomId}`);
       io.to(roomId).emit('updateUserList', rooms[roomId].users); // Mettre à jour la liste des utilisateurs
@@ -130,7 +177,7 @@ io.on('connection', (socket) => {
     }
   }
 
-  // Function to validate quiz format
+
   function validateQuiz(quiz) {
     if (!quiz.title || !quiz.description || !quiz.author || !Array.isArray(quiz.questions)) {
       return false;

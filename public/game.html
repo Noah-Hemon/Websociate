@@ -165,11 +165,41 @@
         border-radius: 5px;
         cursor: pointer;
     }
+    header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #2a2a3d;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        header a {
+            text-decoration: none;
+            color: #4caf50;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        header img {
+            height: 50px;
+            width: auto;
+            border-radius: 5px;
+        }
 </style>
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
+  <header>
+    <a href="..">Home</a>
+    <img src="image.png" alt="Logo">
+</header>
   <div id="app">
     <!-- Home page to create and join rooms -->
     <div v-if="currentView === 'main'">
@@ -235,6 +265,7 @@
           currentQuestion: null,
           currentAnswers: [],
           quizStatusInterval: null,
+          score: 0,
         };
       },
       mounted() {
@@ -267,6 +298,10 @@
               this.onStartGame(quiz);
             }
           }
+        });
+        socket.on('redirect', (url) => {
+          console.log('Redirecting to:', url);
+          window.location.href = url;
         });
 
         // Start the interval to request user list updates
@@ -426,9 +461,10 @@
             console.error('Quiz or quiz.questions is null or undefined');
             return;
           }
+          const totalQuestions = this.quiz.questions.length; // Define totalQuestions here
           if (this.currentQuestionIndex >= this.quiz.questions.length) {
-            alert('Quiz completed!');
-            this.currentView = 'room';
+            alert('Quiz completed with score: ' + this.score);
+            window.location.href = `draw.html?score=${this.score}&total=${totalQuestions}`;
             return;
           }
           this.currentQuestion = this.quiz.questions[this.currentQuestionIndex];
@@ -442,6 +478,7 @@
           const buttons = document.querySelectorAll('.answer-button');
           if (this.currentAnswers[index] === this.currentQuestion.answers[0]) {
             buttons[index].style.backgroundColor = 'green';
+            this.score += 1; // Increment score for correct answer
           } else {
             buttons[index].style.backgroundColor = 'darkred';
           }
