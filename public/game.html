@@ -1,150 +1,207 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JamCat</title>
   <style>
-    /* Styles généraux */
+    /* General styles */
     * {
-      box-sizing: border-box;
+        box-sizing: border-box;
     }
     body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #1e1e2f; /* Fond sombre pour ressembler à Gimkit */
+        font-family: Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #1e1e2f; /* Dark background to resemble Gimkit */
     }
 
     #app {
-      width: 100%;
-      max-width: 600px;
-      padding: 20px;
-      background-color: #2a2a3d; /* Fond de la carte */
-      border-radius: 8px;
-      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-      color: #fff;
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+        background-color: #2a2a3d; /* Card background */
+        border-radius: 8px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        color: #fff;
     }
 
     h2 {
-      text-align: center;
-      color: #f5f5f5;
-      font-size: 1.5rem;
-      margin-top: 0;
+        text-align: center;
+        color: #f5f5f5;
+        font-size: 1.5rem;
+        margin-top: 0;
     }
 
     input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 4px;
-      background-color: #3a3a4d;
-      color: #fff;
-      font-size: 1rem;
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 4px;
+        background-color: #3a3a4d;
+        color: #fff;
+        font-size: 1rem;
     }
 
     button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 4px;
-      background-color: #4caf50; /* Vert similaire à Gimkit */
-      color: #fff;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      margin-top: 10px;
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 4px;
+        background-color: #4caf50; /* Green similar to Gimkit */
+        color: #fff;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 10px;
     }
 
     button:hover {
-      background-color: #45a049;
+        background-color: #45a049;
     }
 
     button:disabled {
-      background-color: #888;
-      cursor: not-allowed;
+        background-color: #888;
+        cursor: not-allowed;
     }
 
     hr {
-      border: none;
-      border-top: 1px solid #555;
-      margin: 20px 0;
+        border: none;
+        border-top: 1px solid #555;
+        margin: 20px 0;
     }
 
-    /* Styles pour la liste des utilisateurs dans la salle */
+    /* Styles for the user list in the room */
     ul {
-      list-style-type: none;
-      padding: 0;
+        list-style-type: none;
+        padding: 0;
     }
     li {
-      background-color: #3a3a4d;
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 4px;
+        background-color: #3a3a4d;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 4px;
     }
 
-    /* Styles pour la boîte de téléchargement de fichier */
+    /* Styles for the file upload box */
     .file-upload {
-      border: 2px dashed #4caf50;
-      padding: 20px;
-      text-align: center;
-      border-radius: 4px;
-      margin-top: 10px;
+        border: 2px dashed #4caf50;
+        padding: 20px;
+        text-align: center;
+        border-radius: 4px;
+        margin-top: 10px;
     }
     .file-upload input[type="file"] {
-      display: none;
+        display: none;
     }
     .file-upload label {
-      cursor: pointer;
-      color: #4caf50;
-      font-weight: bold;
+        cursor: pointer;
+        color: #4caf50;
+        font-weight: bold;
     }
     .file-name {
-      margin-top: 10px;
-      color: #fff;
+        margin-top: 10px;
+        color: #fff;
     }
-  </style>
+
+    /* Styles for the drawing canvas and controls */
+    
+    canvas {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .controls {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+    .color-picker {
+        display: flex;
+        gap: 10px;
+    }
+    .color-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+    }
+    .info {
+        position: absolute;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+    }
+    .slider {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: white;
+        font-family: Arial, sans-serif;
+    }
+    .eraser {
+        padding: 10px 20px;
+        background-color: white;
+        color: black;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
   <div id="app">
-    <!-- Page d'accueil pour créer et rejoindre des salles -->
+    <!-- Home page to create and join rooms -->
     <div v-if="currentView === 'main'">
-      <h2>Créer une salle de jeu</h2>
-      <input type="text" v-model="username" placeholder="Entrez votre nom" maxlength="50">
-      <button @click="createRoom">Créer une salle</button>
+      <h2>Create a game room</h2>
+      <input type="text" v-model="username" placeholder="Enter your name" maxlength="50">
+      <button @click="createRoom">Create a room</button>
       <hr>
-      <h2>Rejoindre une salle</h2>
-      <input type="text" v-model="username" placeholder="Entrez votre nom" maxlength="50">
-      <input type="text" v-model="roomId" placeholder="Entrez l'ID de la salle">
-      <button @click="joinRoom">Rejoindre</button>
+      <h2>Join a room</h2>
+      <input type="text" v-model="username" placeholder="Enter your name" maxlength="50">
+      <input type="text" v-model="roomId" placeholder="Enter the room ID">
+      <button @click="joinRoom">Join</button>
     </div>
 
-    <!-- Page de la salle avec la liste des utilisateurs connectés -->
+    <!-- Room page with the list of connected users -->
     <div v-if="currentView === 'room'">
-      <h2>ID de la salle : {{ roomId }}</h2>
-      <h3>Utilisateurs connectés :</h3>
+      <h2>Room ID: {{ roomId }}</h2>
+      <h3>Connected Users:</h3>
       <ul>
         <li v-for="user in users" :key="user.id">{{ user.username }}</li>
       </ul>
-      <button @click="leaveRoom">Quitter la salle</button>
+      <button @click="leaveRoom">Leave Room</button>
       <div v-if="isHost">
         <div class="file-upload">
           <input type="file" id="fileInput" @change="handleFileUpload">
-          <label for="fileInput">Cliquez pour télécharger le fichier de quiz</label>
+          <label for="fileInput">Click to upload the quiz file</label>
           <div class="file-name" v-if="fileName">{{ fileName }}</div>
         </div>
         <button @click="startGame" :disabled="!quiz">Start Game</button>
       </div>
     </div>
 
-    <!-- Page du jeu -->
+    <!-- Game page -->
     <div v-if="currentView === 'game'">
       <h2>{{ currentQuestion ? currentQuestion.questionText : '' }}</h2>
       <ul>
@@ -154,7 +211,7 @@
       </ul>
     </div>
 
-    <!-- Ajout de l'élément audio pour la musique -->
+    <!-- Adding the audio element for music -->
     <audio id="join-sound" src="Gimkit.mp3" preload="auto"></audio>
   </div>
 
@@ -165,7 +222,7 @@
       el: '#app',
       data() {
         return {
-          currentView: 'main', // Vue actuelle : "main" pour l'accueil, "room" pour la salle, "game" pour le jeu
+          currentView: 'main', // Current view: "main" for home, "room" for the room, "game" for the game
           username: '',
           roomId: '',
           users: [],
@@ -181,11 +238,11 @@
         };
       },
       mounted() {
-        this.joinSound = document.getElementById("join-sound"); // Charger l'audio pour le son de connexion
+        this.joinSound = document.getElementById("join-sound"); // Load the audio for the join sound
 
-        // Événements Socket.io pour gérer la connexion et la déconnexion
-        socket.on('connect', () => console.log('Connecté au serveur via WebSocket'));
-        socket.on('connect_error', (err) => console.error('Erreur de connexion à WebSocket:', err.message));
+        // Socket.io events to handle connection and disconnection
+        socket.on('connect', () => console.log('Connected to the server via WebSocket'));
+        socket.on('connect_error', (err) => console.error('WebSocket connection error:', err.message));
         socket.on('roomCreated', this.onRoomCreated);
         socket.on('roomJoined', this.onRoomJoined);
         socket.on('updateUserList', this.updateUserList);
@@ -227,39 +284,39 @@
         }, 2000);
       },
       methods: {
-        // Fonction pour créer une salle
+        // Function to create a room
         createRoom() {
           if (this.username.trim() === "") {
-            alert("Veuillez entrer un nom d'utilisateur.");
+            alert("Please enter a username.");
             return;
           }
           socket.emit("createRoom", this.username);
         },
         
-        // Fonction pour rejoindre une salle
+        // Function to join a room
         joinRoom() {
           if (typeof this.roomId !== 'string') {
             this.roomId = String(this.roomId);
           }
           if (this.username.trim() === "" || this.roomId.trim() === "") {
-            alert("Veuillez entrer un nom d'utilisateur et un ID de salle.");
+            alert("Please enter a username and a room ID.");
             return;
           }
           socket.emit("joinRoom", this.roomId, this.username);
         },
         
-        // Jouer la musique
+        // Play the join sound
         playJoinSound() {
-          this.joinSound.play().catch(error => console.log("Erreur lors de la lecture de la musique:", error));
+          this.joinSound.play().catch(error => console.log("Error playing the sound:", error));
         },
 
-        // Arrêter la musique
+        // Stop the join sound
         stopJoinSound() {
           this.joinSound.pause();
           this.joinSound.currentTime = 0;
         },
 
-        // Lorsqu'une salle est créée
+        // When a room is created
         onRoomCreated(roomId, users) {
           this.roomId = roomId;
           this.users = users;
@@ -270,7 +327,7 @@
           console.log('Room created:', roomId, users);
         },
 
-        // Lorsqu'une salle est rejointe
+        // When a room is joined
         onRoomJoined(roomId, users, hostId) {
           this.roomId = roomId;
           this.users = users;
@@ -281,13 +338,13 @@
           console.log('Room joined:', roomId, users);
         },
 
-        // Mettre à jour la liste des utilisateurs
+        // Update the user list
         updateUserList(users) {
           this.users = users;
           console.log('User list updated:', users);
         },
 
-        // Fonction pour quitter la salle
+        // Function to leave the room
         leaveRoom() {
           socket.emit("leaveRoom");
           this.currentView = 'main';
@@ -389,6 +446,11 @@
             buttons[index].style.backgroundColor = 'darkred';
           }
 
+          // Disable all buttons
+          buttons.forEach(button => {
+            button.disabled = true;
+          });
+
           // Change the color of the other buttons
           this.currentAnswers.forEach((answer, i) => {
             if (i !== index) {
@@ -407,6 +469,10 @@
             // Reset button colors to base colors
             buttons.forEach(button => {
               button.style.backgroundColor = '';
+            });
+            // Enable all buttons
+            buttons.forEach(button => {
+              button.disabled = false;
             });
           }, 2000);
         },
@@ -432,6 +498,6 @@
         }
       }
     });
-  </script>
+</script>
 </body>
 </html>

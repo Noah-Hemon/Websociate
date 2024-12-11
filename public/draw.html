@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Drawing with Eraser and Size Adjust</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a1a;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .color-picker {
+            display: flex;
+            gap: 10px;
+        }
+        .color-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        .info {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .slider {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .eraser {
+            padding: 10px 20px;
+            background-color: white;
+            color: black;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="drawingCanvas"></canvas>
+    <div class="info">Hold down click to draw. Pick a color or use the eraser:</div>
+    <div class="controls">
+        <div class="color-picker" id="colorPicker"></div>
+        <button class="eraser" id="eraser">Eraser</button>
+        <div class="slider">
+            <label for="sizeSlider">Pencil Size</label>
+            <input type="range" id="sizeSlider" min="1" max="50" value="5">
+        </div>
+    </div>
+    <script>
+        const COLORS = ["#ef233c", "#A7EBCA", "#FFFFFF", "#FFC300", "#868E80"];
+        let currentColor = COLORS[0];
+        let isDrawing = false;
+        let pencilSize = 5;
+        let isEraser = false;
+
+        const canvas = document.getElementById("drawingCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const colorPicker = document.getElementById("colorPicker");
+        const sizeSlider = document.getElementById("sizeSlider");
+        const eraserButton = document.getElementById("eraser");
+
+        // Create color selection circles
+        COLORS.forEach(color => {
+            const circle = document.createElement("div");
+            circle.className = "color-circle";
+            circle.style.backgroundColor = color;
+            circle.addEventListener("click", () => {
+                currentColor = color;
+                isEraser = false;
+            });
+            colorPicker.appendChild(circle);
+        });
+
+        // Eraser functionality
+        eraserButton.addEventListener("click", () => {
+            isEraser = true;
+        });
+
+        // Update pencil size
+        sizeSlider.addEventListener("input", (e) => {
+            pencilSize = e.target.value;
+        });
+
+        // Update canvas size on window resize
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Mouse event listeners
+        canvas.addEventListener("mousedown", () => {
+            isDrawing = true;
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            isDrawing = false;
+            ctx.beginPath(); // Reset the path
+        });
+
+        canvas.addEventListener("mousemove", draw);
+
+        function draw(event) {
+            if (!isDrawing) return;
+
+            ctx.lineWidth = pencilSize;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = isEraser ? "#1a1a1a" : currentColor;
+
+            ctx.lineTo(event.clientX, event.clientY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(event.clientX, event.clientY);
+        }
+    </script>
+</body>
+</html>
